@@ -1,156 +1,227 @@
-## Day 02 Topics
+# Day 01 - Node.js Basics, NPM, Packages, and Express Server
 
-- Program server to response to users
-- Deploy server
-- Understanding what are APIs
-- What is REST API
-- Create mini project with REST API
+## Topics Covered
 
-STEP 1:
-- Install a package [npm i express]
-- Create a file [server.js]
+- How to run a script outside the browser
+- What are packages?
+  - How to install packages
+  - How to use packages
+- What is a server?
+- Creating a server using Express
 
-    const express = require("express")
-    const app = express() // server instance is created
+---
 
-    app.get('/', (req, res) => {
-        res.send("Hello world")
-    })
+# Step 1: Running JavaScript Outside the Browser
 
-    app.get('/about', function(req, res) => {
-        res.send("This is about page")
-    })
+## Install Node.js
 
-    app.get('/home', function(req, res) => {
-        res.send("This is home page")
-    })
+Download and install Node.js from the official website.
 
-    app.listen(3000) // server is started
+## Create an `index.js` File
 
-- Run the server [localhost:3000]
-- Restart the server
+```js
+console.log("Hello world.");
+```
 
-STEP 2:
-- Port Number [localhost:3000]
-- The OS provides a port number to the server (3000), server gets run as a process
-- It is a process to communicate with a server
-- Note: we can't provide a port number manually to any application or a process
-- But why 3000? --- it is pre-defined, developers learn from docs and it became an industry standard to use this port number as a process for a development server
+### Write a Small Loop
 
-STEP 3:
-- Instead of [node server.js] and CTRL + C --- to stop and restart the server manually
-- Use the command [npx nodemon server.js] --- automatically restarts the server whenever the file gets modified
+```js
+for (let i = 0; i < 5; i++) {
+    console.log(i);
+}
+```
 
-STEP 4:
-- When you are commiting your code to github repo, remember not to push or uplaod [node_modules, .env] to github
-- Better to create a separate file [.gitignore] - this files ignores the files and directories which are present under this file
-Example:
-    [.gitignore]
-        - node_modules
-        - .env
+### Run the File
 
-STEP 5:
-- Push your code to github repo
-- After push, search render and sign-in with your account [render is a web application were backend applications are deployed]
-- Select web service, connect with github, search your repo and select
-- Add build command [npm i]
-- Add start command [node server.js]
-- Deploy web service [it will take sometime]
-- Congratulations you have deployed your first basic web service [backend]
-- Download and install Postman desktop application for next day task 
+Open the terminal and execute:
 
+```bash
+node index.js
+```
 
+---
 
+# Step 2: Understanding Packages and NPM
 
+## What is NPM?
 
-## Day 01 Topics
+NPM (Node Package Manager) is the default package manager for Node.js.
 
-- How to run script outside the browser
-- What are packages
-    - How to install packages
-    - How to use packages
-- What is server
-- Create server with express
+It can be considered a marketplace or repository where developers publish packages that can be installed and used in projects.
 
+## What is a Package?
 
+A package is a collection of code or instructions written by developers and published for public use.
 
-STEP 1: 
-- Install node.js
-- Create index.js file in same folder,
-    - write console.log("Hello world.")
-    - write a small function
-        for(i=0; i<5; i++){
-            console.log(i)
-        }
-    - run the file with [node index.js]
+### Example Package: `cat-me`
 
-STEP 2:
-- Go to browser and search for npm, [npm js website is a placeholder or we can call as marketplace for all the packages]
-- A package is a set of instructions or code which is written and published by other developers all over the world to use it publicly
-- Search for a package [cat-me]
-- Open terminal in vscode and type the command - "npm i cat-me" [package installed in our system]
-- Once package gets installed, on the left hand side of vscode file explorer we can see folders [node_modules, package.json, package-lock.json]
+Search for the package on the NPM website and install it using:
 
-STEP 3:
-- Once installed, use the package
-- Create a file [app.js] and write:
-    const catMe = require("cat-me")
-    console.log(catMe())
-- Open terminal and run command [node app.js], a random cat appears on the terminal
+```bash
+npm i cat-me
+```
 
-STEP 4:
-Till now we have done this:
-- package install - npm i cat-me
-- package require/use - const catMe = require("cat-me")
-- package call - console.log(catMe())
+After installation, the following files and folders will be created:
 
-STEP 5:
-node_modules --- package installed and stored in
-package.json --- dependencies/packages installed and version, also maintaining, consists of dependency, scriptautomation commands and project identification
-package-lock.json ---  file is automatically generated by npm (Node Package Manager) to lock the exact versions of every project dependency and sub-dependency installed. It ensures that the exact same dependency tree is installed across all environments, preventing inconsistencies between developer machines and production servers.
+```text
+node_modules/
+package.json
+package-lock.json
+```
 
-STEP 6:
-- What is a server: a machine programmed for the user, were user will request something and proper response will be given
-- Terminal --- [npm init -y] (intializes a node.js project/application)
-- Install a package [npm i express]
-- Create a file [app.js]
-    const express = require("express")
-    const app = express() // server instance is created / called the express
-    app.listen(3000) // server is started
-- Run the server [localhost:3000]
+### Purpose of These Files
 
+| File/Folder | Purpose |
+|------------|----------|
+| `node_modules` | Stores all installed packages and dependencies |
+| `package.json` | Contains project information, dependencies, scripts, and metadata |
+| `package-lock.json` | Locks exact dependency versions to ensure consistency across environments |
 
+---
 
+# Step 3: Using an Installed Package
 
-day 9
-Step 1:
-- npm init -y 
-[it initializes an npm (Node.js) project by creating package.json.]
+Create a file named `app.js`:
 
-- create two folders --- [/Frontend & /Backend]
+```js
+const catMe = require("cat-me");
 
-- install express and mongoose package via npm
-[create it under folder /Backend]
+console.log(catMe());
+```
 
+Run the file:
 
+```bash
+node app.js
+```
 
-Step 2:
-- create two files [app.js & server.js] under folder [/src]
+### Output
 
-- app.js [to create a server]
-- server.js [to start the server and connect to db]
+A random ASCII cat will be displayed in the terminal.
 
-- create a file [database.js] under folder [/config]
+---
 
-- database.js [write a function to connect to db - pass the uri]
+# Step 4: Package Installation Workflow
 
-- create a file [.env] under folder [/Backend],
-- note: go to mongodb compass [desktop], and right click to connections and copy connection string, before this, the cluster and database should be created in mogodb atlas [browser] 
-- after adding string [MONGO_URI] add a /db_name to create a db
+### Install a Package
 
-- npm i dotenv [to access MONGO_URI this package is required]
-- add in [server.js] --- require('dotenv').config()
+```bash
+npm i cat-me
+```
 
-storing a data in database is called as creating schema, because we need to tell database on which format we need to store the data 
-layman terms = data format
-technical term = schema
+### Import (Require) the Package
+
+```js
+const catMe = require("cat-me");
+```
+
+### Use the Package
+
+```js
+console.log(catMe());
+```
+
+---
+
+# Step 5: Important Project Files
+
+## `node_modules`
+
+Contains all installed packages and their dependencies.
+
+## `package.json`
+
+Maintains:
+
+- Project information
+- Installed dependencies
+- Version details
+- Script automation commands
+- Project metadata
+
+## `package-lock.json`
+
+Automatically generated by NPM.
+
+Purpose:
+
+- Locks exact versions of dependencies and sub-dependencies.
+- Ensures the same dependency tree is installed on every machine.
+- Prevents inconsistencies between development and production environments.
+
+---
+
+# Step 6: Introduction to Servers
+
+## What is a Server?
+
+A server is a machine or application programmed to receive requests from users and provide appropriate responses.
+
+---
+
+# Creating a Node.js Project
+
+Initialize a project:
+
+```bash
+npm init -y
+```
+
+### What Does It Do?
+
+Creates a `package.json` file and initializes a Node.js application.
+
+---
+
+# Installing Express
+
+Install Express:
+
+```bash
+npm i express
+```
+
+---
+
+# Creating a Simple Express Server
+
+Create a file named `app.js`:
+
+```js
+const express = require("express");
+
+const app = express(); // Creates an Express application instance
+
+app.listen(3000); // Starts the server on port 3000
+```
+
+### Run the Server
+
+```bash
+node app.js
+```
+
+### Open in Browser
+
+```text
+http://localhost:3000
+```
+
+If the server starts successfully, Express will begin listening on port `3000`.
+
+---
+
+# Summary
+
+1. Installed Node.js.
+2. Ran JavaScript outside the browser using Node.
+3. Learned about NPM and packages.
+4. Installed and used the `cat-me` package.
+5. Understood:
+   - `node_modules`
+   - `package.json`
+   - `package-lock.json`
+6. Learned what a server is.
+7. Initialized a Node.js project.
+8. Installed Express.
+9. Created and started a basic Express server.
