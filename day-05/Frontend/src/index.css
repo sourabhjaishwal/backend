@@ -1,0 +1,79 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+
+}
+
+html {
+  background-color: #1a1a1a;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header {
+  color: #ffff;
+  margin: 2rem 5rem;
+}
+
+.notes {
+  display: flex;
+  gap: 1rem;
+  padding-block: 1rem;
+  padding-inline: 3rem;
+  flex-wrap: wrap;
+}
+
+.note {
+  background-color: #ecd881;
+  padding: 1rem;
+  border-radius: 0.7rem;
+  max-width: 20rem;
+  color: rgb(44, 33, 33);
+}
+
+.note-create-form {
+  display: flex;
+  gap: 1rem;
+  padding-inline: 3rem;
+  padding-block: 1rem;
+}
+
+.note-create-form input {
+  border: none;
+  padding-inline: 1rem;
+  padding-block: 1rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+}
+
+.note-create-form button {
+  cursor: pointer;
+  border: none;
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  background-color: #5a30e5;
+  color: #ffff;
+  font-weight: bold;
+}
+
+.notes button {
+  cursor: pointer;
+  border: none;
+  margin-top: 1rem;
+  padding-inline: 0.5rem;
+  padding-block: 0.3rem;
+  font-size: 1rem;
+  border-radius: 0.3rem;
+  background-color: #ed1616;
+  color: #ffff;
+  font-weight: bold;
+}
