@@ -819,3 +819,1041 @@ Common types include:
 - Explored different types of servers.
 
 ---
+
+## 🚀 Full-Stack Notes Application
+
+Day 5 focuses on building a simple **full-stack Notes Application** using:
+
+* **Backend:** Node.js, Express.js, MongoDB, Mongoose
+* **Frontend:** React.js, Axios
+* **Database:** MongoDB
+* **Deployment:** Render
+* **API Communication:** REST API
+
+The application allows users to:
+
+* Create notes
+* View all notes
+* Update notes
+* Delete notes
+
+The project is divided into two parts:
+
+* **Part 1:** Backend
+* **Part 2:** Frontend
+
+---
+
+# Part 1 - Backend
+
+### 📌 1. Backend Project Structure
+
+The backend is responsible for:
+
+* Creating the Express server
+* Connecting to MongoDB
+* Defining the Note model
+* Creating REST API endpoints
+* Handling CRUD operations
+* Serving frontend static files
+
+```text
+Backend/
+├── node_modules/
+├── public/
+│   ├── assets/
+│   ├── favicon.svg
+│   ├── icons.svg
+│   └── index.html
+├── src/
+│   ├── config/
+│   │   └── database.js
+│   ├── models/
+│   │   └── note.model.js
+│   └── app.js
+├── .env
+├── .gitignore
+├── package-lock.json
+├── package.json
+└── server.js
+```
+
+### 📌 2. Database Configuration
+
+The `database.js` file is responsible for connecting the backend application to MongoDB.
+
+```js
+const mongoose = require("mongoose");
+
+function connectToDB() {
+  mongoose.connect(process.env.MONGO_URI).then(() => {
+    console.log("Connected to DB.");
+  });
+}
+
+module.exports = connectToDB;
+```
+
+**Explanation**
+
+* `mongoose` is used to connect Node.js with MongoDB.
+* `process.env.MONGO_URI` reads the MongoDB connection string from the environment variables.
+* `mongoose.connect()` establishes a connection with the database.
+* `connectToDB()` is exported so it can be called from `server.js`.
+
+**Important Note**
+
+The MongoDB connection string should be stored in `.env` instead of directly writing it inside the source code.
+
+Example:
+
+```env
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/day-05
+```
+
+This helps keep sensitive database credentials private.
+
+### 📌 3. Creating the Note Schema
+
+The `note.model.js` file defines how a note should be structured in MongoDB.
+
+```js
+const mongoose = require("mongoose");
+
+const noteSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+});
+
+const noteModel = mongoose.model("notes", noteSchema);
+
+module.exports = noteModel;
+```
+
+### 📌 4. What is a Schema?
+
+A **schema** defines the structure and format of data stored in the database.
+
+In this application, every note contains:
+
+* `title`
+* `description`
+
+The schema is defined as:
+
+```js
+const noteSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+});
+```
+
+This means that the expected data structure for a note is:
+
+```json
+{
+  "title": "Learn MongoDB",
+  "description": "Learn MongoDB basics"
+}
+```
+
+### 📌 5. What is a Model?
+
+A **model** is used to interact with the MongoDB database.
+
+It provides methods that allow us to perform operations such as:
+
+* Create
+* Read
+* Update
+* Delete
+
+The model is created using:
+
+```js
+const noteModel = mongoose.model("notes", noteSchema);
+```
+
+The model is then exported:
+
+```js
+module.exports = noteModel;
+```
+
+This allows the model to be imported and used inside `app.js`.
+
+### 📌 6. What is a Collection?
+
+A **collection** is used to store multiple documents that have a similar structure.
+
+The relationship can be understood as:
+
+```text
+MongoDB
+   │
+   ▼
+Database
+   │
+   ▼
+Collection
+   │
+   ▼
+Documents
+```
+
+For this application:
+
+```text
+Database
+   │
+   ▼
+notes Collection
+   │
+   ├── Note Document 1
+   ├── Note Document 2
+   └── Note Document 3
+```
+
+The `notes` collection contains multiple note documents.
+
+### 📌 7. Creating the Express Application
+
+The `app.js` file is responsible for:
+
+* Creating the Express application
+* Configuring middleware
+* Importing the Note model
+* Creating REST API routes
+* Serving static frontend files
+
+```js
+const express = require("express");
+const noteModel = require("./models/note.model");
+const cors = require("cors");
+const path = require("path");
+
+const app = express();
+
+app.use(express.json());
+app.use(cors());
+```
+
+### 📌 8. Express JSON Middleware
+
+```js
+app.use(express.json());
+```
+
+This middleware allows Express to read JSON data sent in the request body.
+
+For example, the frontend can send:
+
+```json
+{
+  "title": "Learn React",
+  "description": "Learn React basics"
+}
+```
+
+The backend can then access this data using:
+
+```js
+req.body
+```
+
+### 📌 9. CORS Middleware
+
+```js
+app.use(cors());
+```
+
+**CORS (Cross-Origin Resource Sharing)** allows the frontend and backend to communicate when they are running on different origins.
+
+For example:
+
+```text
+Frontend → https://frontend.example.com
+
+Backend → https://backend.example.com
+```
+
+Without appropriate CORS configuration, the browser may block requests between different origins.
+
+### 📌 10. Serving Static Files
+
+The Express static middleware can serve files such as:
+
+* HTML
+* CSS
+* JavaScript
+* Images
+* Other frontend assets
+
+```js
+app.use(express.static("./public"));
+```
+
+This makes files inside the `public` directory publicly accessible.
+
+### 📌 11. Creating a Note - POST API
+
+The POST endpoint creates a new note and saves it to MongoDB.
+
+```js
+app.post("/api/notes", async (req, res) => {
+  const { title, description } = req.body;
+
+  const notes = await noteModel.create({
+    title,
+    description,
+  });
+
+  res.status(201).json({
+    message: "Note created successfully.",
+    notes,
+  });
+});
+```
+
+**Request Body**
+
+```json
+{
+  "title": "Learn Express",
+  "description": "Learn Express.js basics"
+}
+```
+
+**Flow**
+
+```text
+Frontend
+   │
+   │ POST /api/notes
+   ▼
+Express Server
+   │
+   │ noteModel.create()
+   ▼
+MongoDB
+   │
+   ▼
+New Note Created
+```
+
+The API returns status code **201 Created** when the note is successfully created.
+
+### 📌 12. Reading Notes - GET API
+
+The GET endpoint retrieves all notes from MongoDB.
+
+```js
+app.get("/api/notes", async (req, res) => {
+  const notes = await noteModel.find();
+
+  res.status(200).json({
+    message: "Notes fetched successfully.",
+    notes,
+  });
+});
+```
+
+`noteModel.find()` retrieves all note documents.
+
+The response contains:
+
+```json
+{
+  "message": "Notes fetched successfully.",
+  "notes": []
+}
+```
+
+### 📌 13. Deleting a Note - DELETE API
+
+The DELETE endpoint removes a note using its MongoDB ID.
+
+```js
+app.delete("/api/notes/:id", async (req, res) => {
+  const id = req.params.id;
+
+  await noteModel.findByIdAndDelete(id);
+
+  res.status(200).json({
+    message: "Note deleted successfully.",
+    id,
+  });
+});
+```
+
+**Example Request**
+
+```text
+DELETE /api/notes/65abc123
+```
+
+The ID is received using:
+
+```js
+req.params.id
+```
+
+The note is then deleted using:
+
+```js
+noteModel.findByIdAndDelete(id);
+```
+
+### 📌 14. Updating a Note - PATCH API
+
+The PATCH endpoint updates a note using its MongoDB ID.
+
+```js
+app.patch("/api/notes/:id", async (req, res) => {
+  const id = req.params.id;
+  const { description } = req.body;
+
+  await noteModel.findByIdAndUpdate(id, { description });
+
+  res.status(200).json({
+    message: "Note updated successfully.",
+  });
+});
+```
+
+The note ID comes from:
+
+```js
+req.params.id
+```
+
+The updated description comes from:
+
+```js
+req.body
+```
+
+This endpoint updates only the `description` field.
+
+### 📌 15. Backend API Endpoints
+
+The Notes application provides the following REST API endpoints:
+
+| Method | Endpoint         | Purpose           |
+| ------ | ---------------- | ----------------- |
+| POST   | `/api/notes`     | Create a new note |
+| GET    | `/api/notes`     | Get all notes     |
+| PATCH  | `/api/notes/:id` | Update a note     |
+| DELETE | `/api/notes/:id` | Delete a note     |
+
+These endpoints represent the CRUD operations of the application.
+
+### 📌 16. Wildcard Middleware
+
+The backend uses a wildcard route to serve the frontend application.
+
+```js
+app.use("*name", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "./public/index.html"));
+});
+```
+
+The purpose of this middleware is to return the frontend's `index.html` for routes that are not handled by the API.
+
+This can be useful when serving a Single Page Application from the backend.
+
+### 📌 17. Starting the Backend Server
+
+The `server.js` file is responsible for:
+
+* Loading environment variables
+* Importing the Express application
+* Connecting to MongoDB
+* Starting the server
+
+```js
+require("dotenv").config();
+
+const app = require("./src/app");
+const connectToDB = require("./src/config/database");
+
+connectToDB();
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000.");
+});
+```
+
+### 📌 18. Understanding the Backend Startup Flow
+
+When the backend starts, the process is:
+
+```text
+server.js
+    │
+    ├── Load .env variables
+    │
+    ├── Import app.js
+    │
+    ├── Import database connection
+    │
+    ├── Connect to MongoDB
+    │
+    └── Start Express Server
+```
+
+### 🎯 Part 1 Summary
+
+* Created the backend structure for a Notes application.
+* Connected the backend to MongoDB using Mongoose.
+* Learned about schemas, models, collections, and documents.
+* Configured Express middleware.
+* Used `express.json()` to process JSON request bodies.
+* Used CORS to allow frontend-backend communication.
+* Created REST API endpoints for CRUD operations.
+* Created, fetched, updated, and deleted notes using MongoDB.
+* Used environment variables to store the MongoDB connection string.
+* Learned how the backend server starts and connects to the database.
+
+---
+
+# Part 2 - Frontend
+
+### 📌 1. Frontend Project Structure
+
+The frontend is built using **React.js** and **Vite**.
+
+```text
+Frontend/
+├── dist/
+│   ├── assets/
+│   ├── favicon.svg
+│   ├── icons.svg
+│   └── index.html
+├── node_modules/
+├── public/
+├── src/
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── .gitignore
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── README.md
+└── vite.config.js
+```
+
+The main application code is located inside the `src` folder.
+
+### 📌 2. React Application Entry Point
+
+The `main.jsx` file is the entry point of the React application.
+
+```jsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+```
+
+### 📌 3. Understanding `createRoot()`
+
+```jsx
+createRoot(document.getElementById("root"))
+```
+
+This connects the React application to the HTML element with the ID `root`.
+
+React then renders the `App` component inside that element.
+
+### 📌 4. Understanding `StrictMode`
+
+```jsx
+<StrictMode>
+  <App />
+</StrictMode>
+```
+
+`StrictMode` is a React development feature that helps identify potential problems in the application.
+
+It does not render any visible UI itself.
+
+### 📌 5. Creating the Main App Component
+
+The `App.jsx` file contains the main UI and application logic.
+
+```jsx
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+function App() {
+  const [notes, setNotes] = useState([]);
+
+  // Application logic
+
+  return (
+    <>
+      <h1 className="header">Simple Notes App</h1>
+    </>
+  );
+}
+
+export default App;
+```
+
+The application uses:
+
+* `useState`
+* `useEffect`
+* Axios
+
+### 📌 6. Managing Notes with `useState`
+
+```jsx
+const [notes, setNotes] = useState([]);
+```
+
+The `notes` state stores the notes received from the backend.
+
+Initially:
+
+```js
+[]
+```
+
+After fetching data, the state is updated using:
+
+```js
+setNotes(res.data.notes);
+```
+
+When the state changes, React automatically re-renders the UI.
+
+### 📌 7. Fetching Notes from the Backend
+
+The `fetchNotes()` function sends a GET request to the backend.
+
+```jsx
+function fetchNotes() {
+  axios
+    .get("https://backend-day-05.onrender.com/api/notes")
+    .then((res) => {
+      setNotes(res.data.notes);
+    });
+}
+```
+
+The process is:
+
+```text
+React Frontend
+      │
+      │ GET /api/notes
+      ▼
+Express Backend
+      │
+      ▼
+MongoDB
+      │
+      ▼
+Notes Data
+      │
+      ▼
+React State
+```
+
+### 📌 8. Fetching Data When the App Loads
+
+The `useEffect()` hook is used to fetch notes when the component loads.
+
+```jsx
+useEffect(() => {
+  fetchNotes();
+}, []);
+```
+
+The empty dependency array:
+
+```jsx
+[]
+```
+
+means the effect runs when the component is initially mounted.
+
+### 📌 9. Creating a Note from the Frontend
+
+The form uses the `handleSubmit()` function.
+
+```jsx
+function handleSubmit(e) {
+  e.preventDefault();
+
+  const { title, description } = e.target.elements;
+
+  axios
+    .post("https://backend-day-05.onrender.com/api/notes", {
+      title: title.value,
+      description: description.value,
+    })
+    .then((res) => {
+      console.log(res.data);
+      fetchNotes();
+    });
+}
+```
+
+The function:
+
+1. Prevents the browser's default form submission.
+2. Gets the title and description fields.
+3. Sends a POST request using Axios.
+4. Sends the note data to the backend.
+5. Fetches the updated list of notes.
+
+### 📌 10. Creating the Note Form
+
+```jsx
+<form className="note-create-form" onSubmit={handleSubmit}>
+  <input
+    name="title"
+    type="text"
+    placeholder="Enter your title"
+  />
+
+  <input
+    name="description"
+    type="text"
+    placeholder="Enter your description"
+  />
+
+  <button>Add Note</button>
+</form>
+```
+
+The `name` attributes allow the form fields to be accessed through:
+
+```jsx
+e.target.elements
+```
+
+### 📌 11. Displaying Notes Using `map()`
+
+The notes are displayed using the JavaScript `map()` method.
+
+```jsx
+<div className="notes">
+  {notes.map((note) => {
+    return (
+      <div className="note">
+        <h1>{note.title}</h1>
+        <p>{note.description}</p>
+      </div>
+    );
+  })}
+</div>
+```
+
+For every note in the `notes` array, React creates a note card.
+
+### 📌 12. Deleting a Note from the Frontend
+
+The `handleDeleteNote()` function sends a DELETE request.
+
+```jsx
+function handleDeleteNote(noteId) {
+  axios
+    .delete("https://backend-day-05.onrender.com/api/notes/" + noteId)
+    .then((res) => {
+      console.log(res.data);
+      fetchNotes();
+    });
+}
+```
+
+The note ID is passed to the backend:
+
+```text
+DELETE /api/notes/:id
+```
+
+After deletion, `fetchNotes()` is called again to refresh the displayed notes.
+
+### 📌 13. Delete Button
+
+Each note has a Delete button:
+
+```jsx
+<button
+  onClick={() => {
+    handleDeleteNote(note._id);
+  }}
+>
+  Delete
+</button>
+```
+
+MongoDB automatically provides each document with a unique `_id`.
+
+That ID is passed to:
+
+```jsx
+handleDeleteNote(note._id);
+```
+
+### 📌 14. Connecting Frontend and Backend
+
+The frontend communicates with the backend through Axios.
+
+The main API operations are:
+
+```text
+React Frontend
+      │
+      ├── GET    → Fetch Notes
+      ├── POST   → Create Note
+      ├── PATCH  → Update Note
+      └── DELETE → Delete Note
+      │
+      ▼
+Express REST API
+      │
+      ▼
+MongoDB
+```
+
+This creates the complete full-stack data flow.
+
+### 📌 15. Styling the Application
+
+The `index.css` file contains the application's global styles.
+
+The universal selector resets default browser spacing:
+
+```css
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+```
+
+The application uses:
+
+* Dark background
+* Flexible note layout
+* Note cards
+* Form inputs
+* Add button
+* Delete button
+
+### 📌 16. Notes Layout
+
+The notes container uses Flexbox:
+
+```css
+.notes {
+  display: flex;
+  gap: 1rem;
+  padding-block: 1rem;
+  padding-inline: 3rem;
+  flex-wrap: wrap;
+}
+```
+
+**Important Properties**
+
+* `display: flex` → Enables Flexbox.
+* `gap` → Adds spacing between note cards.
+* `flex-wrap: wrap` → Moves notes to the next line when necessary.
+
+### 📌 17. Note Card Styling
+
+Each note is displayed as a card:
+
+```css
+.note {
+  background-color: #ecd881;
+  padding: 1rem;
+  border-radius: 0.7rem;
+  max-width: 20rem;
+  color: rgb(44, 33, 33);
+}
+```
+
+The card contains:
+
+* Note title
+* Note description
+* Delete button
+
+### 📌 18. Form Styling
+
+The form uses Flexbox to arrange the input fields and button.
+
+```css
+.note-create-form {
+  display: flex;
+  gap: 1rem;
+  padding-inline: 3rem;
+  padding-block: 1rem;
+}
+```
+
+The inputs are styled with:
+
+```css
+.note-create-form input {
+  border: none;
+  padding-inline: 1rem;
+  padding-block: 1rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+}
+```
+
+### 📌 19. Add and Delete Buttons
+
+The Add Note button uses a purple background:
+
+```css
+.note-create-form button {
+  cursor: pointer;
+  border: none;
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  background-color: #5a30e5;
+  color: #ffff;
+  font-weight: bold;
+}
+```
+
+The Delete button uses a red background:
+
+```css
+.notes button {
+  cursor: pointer;
+  border: none;
+  margin-top: 1rem;
+  padding-inline: 0.5rem;
+  padding-block: 0.3rem;
+  font-size: 1rem;
+  border-radius: 0.3rem;
+  background-color: #ed1616;
+  color: #ffff;
+  font-weight: bold;
+}
+```
+
+### 📌 20. Complete Application Flow
+
+The complete application works like this:
+
+```text
+User
+ │
+ ▼
+React Frontend
+ │
+ │ Axios Request
+ ▼
+Express REST API
+ │
+ │ Mongoose
+ ▼
+MongoDB
+ │
+ │ Response
+ ▼
+Express Backend
+ │
+ ▼
+React State
+ │
+ ▼
+Updated UI
+```
+
+**Creating a Note**
+
+```text
+User enters title + description
+          ↓
+React Form
+          ↓
+Axios POST Request
+          ↓
+Express API
+          ↓
+Mongoose Model
+          ↓
+MongoDB
+          ↓
+Note Created
+          ↓
+fetchNotes()
+          ↓
+Updated React UI
+```
+
+**Deleting a Note**
+
+```text
+User clicks Delete
+          ↓
+React gets note._id
+          ↓
+Axios DELETE Request
+          ↓
+Express API
+          ↓
+findByIdAndDelete()
+          ↓
+MongoDB
+          ↓
+Note Deleted
+          ↓
+fetchNotes()
+          ↓
+Updated React UI
+```
+
+### 🎯 Part 2 Summary
+
+* Created a React frontend using Vite.
+* Used `createRoot()` to render the React application.
+* Used `StrictMode` during development.
+* Managed notes using React `useState`.
+* Used `useEffect` to fetch notes when the application loads.
+* Used Axios to communicate with the backend API.
+* Created notes using POST requests.
+* Fetched notes using GET requests.
+* Deleted notes using DELETE requests.
+* Displayed notes using the `map()` method.
+* Used MongoDB's `_id` to identify individual notes.
+* Styled the application using CSS and Flexbox.
+* Connected the React frontend with the Express backend.
+* Built a complete full-stack CRUD data flow.
+
+### 🎯 Day 5 Summary
+
+* Built a complete full-stack Notes Application.
+* Created a REST API using Express.js.
+* Connected the backend to MongoDB using Mongoose.
+* Learned the role of schemas, models, collections, and documents.
+* Implemented Create, Read, Update, and Delete operations.
+* Used environment variables for database configuration.
+* Added CORS support for frontend-backend communication.
+* Built a React frontend using Vite.
+* Used Axios for API communication.
+* Used React hooks to manage application state and API calls.
+* Connected the frontend, backend, and database into one complete application.
