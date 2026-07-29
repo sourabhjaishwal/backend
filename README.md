@@ -824,23 +824,24 @@ Common types include:
 
 Day 5 focuses on building a simple **full-stack Notes Application** using:
 
-* **Backend:** Node.js, Express.js, MongoDB, Mongoose
-* **Frontend:** React.js, Axios
-* **Database:** MongoDB
-* **Deployment:** Render
-* **API Communication:** REST API
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB
+- **ODM:** Mongoose
+- **Frontend:** React.js
+- **API Communication:** Axios
+- **Deployment:** Render
 
 The application allows users to:
 
-* Create notes
-* View all notes
-* Update notes
-* Delete notes
+- Create notes
+- View notes
+- Update notes
+- Delete notes
 
 The project is divided into two parts:
 
-* **Part 1:** Backend
-* **Part 2:** Frontend
+- **Part 1:** Backend
+- **Part 2:** Frontend
 
 ---
 
@@ -850,12 +851,12 @@ The project is divided into two parts:
 
 The backend is responsible for:
 
-* Creating the Express server
-* Connecting to MongoDB
-* Defining the Note model
-* Creating REST API endpoints
-* Handling CRUD operations
-* Serving frontend static files
+- Creating the Express server
+- Connecting to MongoDB
+- Defining the Note schema and model
+- Creating REST API endpoints
+- Handling CRUD operations
+- Serving static frontend files
 
 ```text
 Backend/
@@ -878,115 +879,25 @@ Backend/
 └── server.js
 ```
 
-### 📌 2. Database Configuration
+### 📌 2. What is MongoDB?
 
-The `database.js` file is responsible for connecting the backend application to MongoDB.
+**MongoDB** is a **NoSQL**, document-based database.
 
-```js
-const mongoose = require("mongoose");
+Unlike relational databases such as MySQL, MongoDB stores data as JSON-like documents internally represented using **BSON (Binary JSON)**.
 
-function connectToDB() {
-  mongoose.connect(process.env.MONGO_URI).then(() => {
-    console.log("Connected to DB.");
-  });
-}
+MongoDB does not require a fixed table structure at the database level, which makes it flexible for storing different types of data.
 
-module.exports = connectToDB;
-```
-
-**Explanation**
-
-* `mongoose` is used to connect Node.js with MongoDB.
-* `process.env.MONGO_URI` reads the MongoDB connection string from the environment variables.
-* `mongoose.connect()` establishes a connection with the database.
-* `connectToDB()` is exported so it can be called from `server.js`.
-
-**Important Note**
-
-The MongoDB connection string should be stored in `.env` instead of directly writing it inside the source code.
-
-Example:
-
-```env
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/day-05
-```
-
-This helps keep sensitive database credentials private.
-
-### 📌 3. Creating the Note Schema
-
-The `note.model.js` file defines how a note should be structured in MongoDB.
-
-```js
-const mongoose = require("mongoose");
-
-const noteSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-});
-
-const noteModel = mongoose.model("notes", noteSchema);
-
-module.exports = noteModel;
-```
-
-### 📌 4. What is a Schema?
-
-A **schema** defines the structure and format of data stored in the database.
-
-In this application, every note contains:
-
-* `title`
-* `description`
-
-The schema is defined as:
-
-```js
-const noteSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-});
-```
-
-This means that the expected data structure for a note is:
+Example document:
 
 ```json
 {
   "title": "Learn MongoDB",
-  "description": "Learn MongoDB basics"
+  "description": "MongoDB basics",
+  "createdAt": "2026-02-05"
 }
 ```
 
-### 📌 5. What is a Model?
-
-A **model** is used to interact with the MongoDB database.
-
-It provides methods that allow us to perform operations such as:
-
-* Create
-* Read
-* Update
-* Delete
-
-The model is created using:
-
-```js
-const noteModel = mongoose.model("notes", noteSchema);
-```
-
-The model is then exported:
-
-```js
-module.exports = noteModel;
-```
-
-This allows the model to be imported and used inside `app.js`.
-
-### 📌 6. What is a Collection?
-
-A **collection** is used to store multiple documents that have a similar structure.
-
-The relationship can be understood as:
+A MongoDB application generally organizes data like this:
 
 ```text
 MongoDB
@@ -1001,6 +912,189 @@ Collection
 Documents
 ```
 
+### 📌 3. What is MongoDB Atlas?
+
+**MongoDB Atlas** is a cloud-hosted MongoDB service.
+
+It allows you to create and manage MongoDB databases in the cloud without managing the database server yourself.
+
+Common features include:
+
+- Free cluster options
+- Automated backups on supported plans
+- Security features
+- Scaling options
+- Multiple cloud providers and regions
+
+Example MongoDB connection string:
+
+```text
+mongodb+srv://username:password@cluster0.mongodb.net/myDB
+```
+
+The connection string contains the information required by the application to connect to the MongoDB deployment.
+
+### 📌 4. What is Mongoose?
+
+**Mongoose** is an **ODM (Object Data Modeling)** library for MongoDB and Node.js.
+
+It makes it easier to:
+
+- Define schemas
+- Create models
+- Validate data
+- Interact with MongoDB
+- Perform CRUD operations
+
+Install Mongoose:
+
+```bash
+npm install mongoose
+```
+
+### 📌 5. Connecting MongoDB with Mongoose
+
+The database connection is stored in `src/config/database.js`.
+
+```js
+const mongoose = require("mongoose");
+
+function connectToDB() {
+  mongoose.connect(process.env.MONGO_URI).then(() => {
+    console.log("Connected to DB.");
+  });
+}
+
+module.exports = connectToDB;
+```
+
+The connection string is stored in an environment variable.
+
+```env
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/day-05
+```
+
+### 📌 6. What Does `require("dotenv").config()` Do?
+
+In `server.js`, we use:
+
+```js
+require("dotenv").config();
+```
+
+This loads variables from the `.env` file into `process.env`.
+
+For example, if `.env` contains:
+
+```env
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/day-05
+```
+
+The application can access it using:
+
+```js
+process.env.MONGO_URI;
+```
+
+This allows sensitive configuration values such as database credentials to remain outside the source code.
+
+### 📌 7. What is a Schema?
+
+A **schema** defines the structure, data types, and rules for documents managed through a Mongoose model.
+
+For the Notes application:
+
+```js
+const mongoose = require("mongoose");
+
+const noteSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+});
+```
+
+This means a note contains:
+
+- `title` → String
+- `description` → String
+
+A schema can also define validation rules and timestamps.
+
+Example:
+
+```js
+const noteSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
+```
+
+`timestamps: true` automatically adds:
+
+- `createdAt`
+- `updatedAt`
+
+### 📌 8. Common Mongoose Schema Types
+
+Some commonly used Mongoose schema types are:
+
+- `String`
+- `Number`
+- `Boolean`
+- `Date`
+- `Array`
+- `ObjectId`
+
+Example:
+
+```js
+const userSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  isActive: Boolean,
+  createdAt: Date,
+  skills: Array,
+});
+```
+
+### 📌 9. What is a Model?
+
+A **model** is created from a Mongoose schema and is used to interact with MongoDB.
+
+It provides methods for operations such as:
+
+- Create
+- Read
+- Update
+- Delete
+
+Example:
+
+```js
+const noteModel = mongoose.model("notes", noteSchema);
+
+module.exports = noteModel;
+```
+
+The model acts as the main interface between the application and the MongoDB collection.
+
+A Mongoose model is associated with a MongoDB collection. Mongoose normally derives the collection name from the model name by pluralizing and lowercasing it.
+
+### 📌 10. What is a Collection?
+
+A **collection** stores multiple documents of a similar type.
+
 For this application:
 
 ```text
@@ -1014,17 +1108,17 @@ notes Collection
    └── Note Document 3
 ```
 
-The `notes` collection contains multiple note documents.
+Each note is stored as a separate document.
 
-### 📌 7. Creating the Express Application
+### 📌 11. Backend Application Configuration
 
 The `app.js` file is responsible for:
 
-* Creating the Express application
-* Configuring middleware
-* Importing the Note model
-* Creating REST API routes
-* Serving static frontend files
+- Creating the Express application
+- Configuring middleware
+- Importing the Note model
+- Creating REST API routes
+- Serving static files
 
 ```js
 const express = require("express");
@@ -1038,30 +1132,63 @@ app.use(express.json());
 app.use(cors());
 ```
 
-### 📌 8. Express JSON Middleware
+### 📌 12. What Does `app.use(express.json())` Do?
 
 ```js
 app.use(express.json());
 ```
 
-This middleware allows Express to read JSON data sent in the request body.
+This enables Express to parse incoming requests containing JSON data.
 
-For example, the frontend can send:
+For example, the frontend may send:
 
 ```json
 {
-  "title": "Learn React",
-  "description": "Learn React basics"
+  "title": "Learn Express",
+  "description": "Learn Express.js basics"
 }
 ```
 
-The backend can then access this data using:
+After `express.json()` processes the request, the data can be accessed through:
 
 ```js
-req.body
+req.body;
 ```
 
-### 📌 9. CORS Middleware
+Without this middleware, Express would not automatically parse JSON request bodies.
+
+### 📌 13. What Does `const { title, description } = req.body` Do?
+
+This line uses **object destructuring**:
+
+```js
+const { title, description } = req.body;
+```
+
+Suppose the request body is:
+
+```json
+{
+  "title": "Learn MongoDB",
+  "description": "Learn MongoDB basics"
+}
+```
+
+The destructuring statement extracts the two properties into variables:
+
+```js
+title;
+description;
+```
+
+It is equivalent to:
+
+```js
+const title = req.body.title;
+const description = req.body.description;
+```
+
+### 📌 14. CORS Middleware
 
 ```js
 app.use(cors());
@@ -1072,80 +1199,204 @@ app.use(cors());
 For example:
 
 ```text
-Frontend → https://frontend.example.com
+Frontend
+https://frontend.example.com
 
-Backend → https://backend.example.com
+        │
+        │ HTTP Request
+        ▼
+
+Backend
+https://backend.example.com
 ```
 
-Without appropriate CORS configuration, the browser may block requests between different origins.
+CORS allows the browser to make cross-origin requests when the server permits them.
 
-### 📌 10. Serving Static Files
+### 📌 15. Serving Static Files
 
-The Express static middleware can serve files such as:
+Express can serve static files such as:
 
-* HTML
-* CSS
-* JavaScript
-* Images
-* Other frontend assets
+- HTML
+- CSS
+- JavaScript
+- Images
+- Other frontend assets
 
 ```js
 app.use(express.static("./public"));
 ```
 
-This makes files inside the `public` directory publicly accessible.
+This makes files inside the `public` directory available to clients.
 
-### 📌 11. Creating a Note - POST API
+### 📌 16. CREATE - Adding a New Note
 
-The POST endpoint creates a new note and saves it to MongoDB.
+The POST API creates a new note and saves it to MongoDB.
 
 ```js
 app.post("/api/notes", async (req, res) => {
   const { title, description } = req.body;
 
-  const notes = await noteModel.create({
+  const note = await noteModel.create({
     title,
     description,
   });
 
   res.status(201).json({
     message: "Note created successfully.",
-    notes,
+    note,
   });
 });
 ```
 
-**Request Body**
+### 📌 17. Understanding the Create Note API
 
-```json
-{
-  "title": "Learn Express",
-  "description": "Learn Express.js basics"
-}
+Let's understand the API step by step.
+
+**Step 1: Define the route**
+
+```js
+app.post("/api/notes", async (req, res) => {
 ```
 
-**Flow**
+This creates a POST endpoint at:
 
 ```text
-Frontend
-   │
-   │ POST /api/notes
-   ▼
-Express Server
-   │
-   │ noteModel.create()
-   ▼
-MongoDB
-   │
-   ▼
-New Note Created
+POST /api/notes
 ```
 
-The API returns status code **201 Created** when the note is successfully created.
+The frontend sends this request when it wants to create a new note.
 
-### 📌 12. Reading Notes - GET API
+**Step 2: Read data from the request**
 
-The GET endpoint retrieves all notes from MongoDB.
+```js
+const { title, description } = req.body;
+```
+
+The title and description are extracted from the JSON request body.
+
+**Step 3: Create the database document**
+
+```js
+const note = await noteModel.create({
+  title,
+  description,
+});
+```
+
+Mongoose creates a new note document and saves it to MongoDB.
+
+**Step 4: Send the response**
+
+```js
+res.status(201).json({
+  message: "Note created successfully.",
+  note,
+});
+```
+
+The server sends a JSON response with:
+
+- HTTP status `201`
+- A success message
+- The newly created note
+
+### 📌 18. CRUD Operations with Mongoose
+
+CRUD stands for:
+
+- **Create**
+- **Read**
+- **Update**
+- **Delete**
+
+These are the four basic operations performed on stored data.
+
+### 📌 19. CREATE - `create()`
+
+The `create()` method creates and saves a new document.
+
+```js
+const note = await Note.create({
+  title: "MongoDB",
+  description: "Learn CRUD",
+});
+```
+
+Another approach is to create a document and then call `save()`:
+
+```js
+const note = new Note({
+  title: "Node.js",
+  description: "Backend basics",
+});
+
+await note.save();
+```
+
+### 📌 20. READ - Fetching Data
+
+#### `find()` - Get Multiple Documents
+
+```js
+const notes = await Note.find();
+```
+
+`find()` returns an **array**.
+
+If multiple documents are found, the result is an array of objects:
+
+```js
+[
+  {
+    _id: "1",
+    title: "MongoDB",
+    description: "Learn MongoDB",
+  },
+  {
+    _id: "2",
+    title: "Node.js",
+    description: "Learn Backend",
+  },
+];
+```
+
+If no documents are found, `find()` returns an empty array:
+
+```js
+[];
+```
+
+#### `findOne()` - Get One Matching Document
+
+```js
+const note = await Note.findOne({
+  title: "MongoDB",
+});
+```
+
+This returns the first matching document.
+
+#### `findById()` - Find by `_id`
+
+```js
+const note = await Note.findById("65c0a9b...");
+```
+
+This is useful when you already have the MongoDB document ID.
+
+#### `find()` with a Condition
+
+```js
+const notes = await Note.find({
+  title: "MongoDB",
+});
+```
+
+This returns all documents matching the condition.
+
+### 📌 21. READ - Getting All Notes from the API
+
+The Notes application uses:
 
 ```js
 app.get("/api/notes", async (req, res) => {
@@ -1158,20 +1409,130 @@ app.get("/api/notes", async (req, res) => {
 });
 ```
 
-`noteModel.find()` retrieves all note documents.
+The `find()` method retrieves all notes.
 
-The response contains:
+The response contains the notes as an array:
 
 ```json
 {
   "message": "Notes fetched successfully.",
-  "notes": []
+  "notes": [
+    {
+      "_id": "1",
+      "title": "Learn MongoDB",
+      "description": "MongoDB basics"
+    },
+    {
+      "_id": "2",
+      "title": "Learn Express",
+      "description": "Express basics"
+    }
+  ]
 }
 ```
 
-### 📌 13. Deleting a Note - DELETE API
+### 📌 22. UPDATE - Modifying Data
 
-The DELETE endpoint removes a note using its MongoDB ID.
+The `findByIdAndUpdate()` method updates a document using its ID.
+
+```js
+const updatedNote = await Note.findByIdAndUpdate(
+  noteId,
+  {
+    title: "Updated Title",
+  },
+  {
+    new: true,
+  },
+);
+```
+
+**Important Options**
+
+- `new: true` → Returns the updated document.
+- `runValidators: true` → Runs the schema validation rules during the update.
+
+Example:
+
+```js
+const updatedNote = await Note.findByIdAndUpdate(
+  noteId,
+  {
+    title: "Updated Title",
+  },
+  {
+    new: true,
+    runValidators: true,
+  },
+);
+```
+
+### 📌 23. UPDATE - Updating a Note Through the API
+
+The Notes application uses a PATCH endpoint:
+
+```js
+app.patch("/api/notes/:id", async (req, res) => {
+  const id = req.params.id;
+  const { description } = req.body;
+
+  await noteModel.findByIdAndUpdate(id, {
+    description,
+  });
+
+  res.status(200).json({
+    message: "Note updated successfully.",
+  });
+});
+```
+
+The note ID is received from:
+
+```js
+req.params.id;
+```
+
+The new description is received from:
+
+```js
+req.body;
+```
+
+The database is updated using:
+
+```js
+noteModel.findByIdAndUpdate();
+```
+
+### 📌 24. DELETE - Removing Data
+
+The `findByIdAndDelete()` method removes a document using its ID.
+
+```js
+await Note.findByIdAndDelete(noteId);
+```
+
+Other deletion methods include:
+
+**`deleteOne()`**
+
+```js
+await Note.deleteOne({
+  _id: noteId,
+});
+```
+
+**`deleteMany()`**
+
+```js
+await Note.deleteMany({
+  title: "Test",
+});
+```
+
+### 📌 25. DELETE - Removing a Note Through the API
+
+The Notes application uses:
 
 ```js
 app.delete("/api/notes/:id", async (req, res) => {
@@ -1186,90 +1547,58 @@ app.delete("/api/notes/:id", async (req, res) => {
 });
 ```
 
-**Example Request**
-
-```text
-DELETE /api/notes/65abc123
-```
-
-The ID is received using:
+The note ID is received through:
 
 ```js
-req.params.id
+req.params.id;
 ```
 
-The note is then deleted using:
+The document is deleted using:
 
 ```js
 noteModel.findByIdAndDelete(id);
 ```
 
-### 📌 14. Updating a Note - PATCH API
+### 📌 26. Complete CRUD API Flow
 
-The PATCH endpoint updates a note using its MongoDB ID.
+The Notes application follows this CRUD structure:
 
-```js
-app.patch("/api/notes/:id", async (req, res) => {
-  const id = req.params.id;
-  const { description } = req.body;
+| Operation | HTTP Method | Endpoint         | Mongoose Method       |
+| --------- | ----------- | ---------------- | --------------------- |
+| Create    | POST        | `/api/notes`     | `create()`            |
+| Read      | GET         | `/api/notes`     | `find()`              |
+| Update    | PATCH       | `/api/notes/:id` | `findByIdAndUpdate()` |
+| Delete    | DELETE      | `/api/notes/:id` | `findByIdAndDelete()` |
 
-  await noteModel.findByIdAndUpdate(id, { description });
+The complete flow is:
 
-  res.status(200).json({
-    message: "Note updated successfully.",
-  });
-});
+```text
+Client
+   │
+   │ HTTP Request
+   ▼
+Express REST API
+   │
+   │ Mongoose
+   ▼
+MongoDB
+   │
+   │ Database Operation
+   ▼
+Response
+   │
+   ▼
+Client
 ```
 
-The note ID comes from:
-
-```js
-req.params.id
-```
-
-The updated description comes from:
-
-```js
-req.body
-```
-
-This endpoint updates only the `description` field.
-
-### 📌 15. Backend API Endpoints
-
-The Notes application provides the following REST API endpoints:
-
-| Method | Endpoint         | Purpose           |
-| ------ | ---------------- | ----------------- |
-| POST   | `/api/notes`     | Create a new note |
-| GET    | `/api/notes`     | Get all notes     |
-| PATCH  | `/api/notes/:id` | Update a note     |
-| DELETE | `/api/notes/:id` | Delete a note     |
-
-These endpoints represent the CRUD operations of the application.
-
-### 📌 16. Wildcard Middleware
-
-The backend uses a wildcard route to serve the frontend application.
-
-```js
-app.use("*name", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "./public/index.html"));
-});
-```
-
-The purpose of this middleware is to return the frontend's `index.html` for routes that are not handled by the API.
-
-This can be useful when serving a Single Page Application from the backend.
-
-### 📌 17. Starting the Backend Server
+### 📌 27. Starting the Backend Server
 
 The `server.js` file is responsible for:
 
-* Loading environment variables
-* Importing the Express application
-* Connecting to MongoDB
-* Starting the server
+- Loading environment variables
+- Importing the Express application
+- Connecting to MongoDB
+- Starting the server
 
 ```js
 require("dotenv").config();
@@ -1284,9 +1613,9 @@ app.listen(3000, () => {
 });
 ```
 
-### 📌 18. Understanding the Backend Startup Flow
+### 📌 28. Backend Startup Flow
 
-When the backend starts, the process is:
+When the backend starts:
 
 ```text
 server.js
@@ -1304,16 +1633,20 @@ server.js
 
 ### 🎯 Part 1 Summary
 
-* Created the backend structure for a Notes application.
-* Connected the backend to MongoDB using Mongoose.
-* Learned about schemas, models, collections, and documents.
-* Configured Express middleware.
-* Used `express.json()` to process JSON request bodies.
-* Used CORS to allow frontend-backend communication.
-* Created REST API endpoints for CRUD operations.
-* Created, fetched, updated, and deleted notes using MongoDB.
-* Used environment variables to store the MongoDB connection string.
-* Learned how the backend server starts and connects to the database.
+- Learned what MongoDB is and how it stores documents.
+- Learned about MongoDB Atlas and cloud-hosted databases.
+- Used Mongoose as an ODM for MongoDB.
+- Learned about schemas, models, collections, and documents.
+- Learned common Mongoose schema types.
+- Used `dotenv` to load environment variables.
+- Used `express.json()` to parse JSON request bodies.
+- Used object destructuring to extract data from `req.body`.
+- Configured CORS for frontend-backend communication.
+- Created REST APIs using Express.
+- Implemented CRUD operations using Mongoose.
+- Learned `create()`, `save()`, `find()`, `findOne()`, `findById()`, `findByIdAndUpdate()`, and deletion methods.
+- Learned how the backend connects the React frontend to MongoDB.
+- Understood the complete request and database flow.
 
 ---
 
@@ -1345,8 +1678,6 @@ Frontend/
 └── vite.config.js
 ```
 
-The main application code is located inside the `src` folder.
-
 ### 📌 2. React Application Entry Point
 
 The `main.jsx` file is the entry point of the React application.
@@ -1367,7 +1698,7 @@ createRoot(document.getElementById("root")).render(
 ### 📌 3. Understanding `createRoot()`
 
 ```jsx
-createRoot(document.getElementById("root"))
+createRoot(document.getElementById("root"));
 ```
 
 This connects the React application to the HTML element with the ID `root`.
@@ -1390,30 +1721,11 @@ It does not render any visible UI itself.
 
 The `App.jsx` file contains the main UI and application logic.
 
-```jsx
-import { useState, useEffect } from "react";
-import axios from "axios";
-
-function App() {
-  const [notes, setNotes] = useState([]);
-
-  // Application logic
-
-  return (
-    <>
-      <h1 className="header">Simple Notes App</h1>
-    </>
-  );
-}
-
-export default App;
-```
-
 The application uses:
 
-* `useState`
-* `useEffect`
-* Axios
+- `useState`
+- `useEffect`
+- Axios
 
 ### 📌 6. Managing Notes with `useState`
 
@@ -1423,31 +1735,29 @@ const [notes, setNotes] = useState([]);
 
 The `notes` state stores the notes received from the backend.
 
-Initially:
+Initially, the state is:
 
 ```js
-[]
+[];
 ```
 
-After fetching data, the state is updated using:
+After fetching data, it is updated using:
 
 ```js
 setNotes(res.data.notes);
 ```
 
-When the state changes, React automatically re-renders the UI.
+When the state changes, React re-renders the UI.
 
 ### 📌 7. Fetching Notes from the Backend
 
-The `fetchNotes()` function sends a GET request to the backend.
+The `fetchNotes()` function sends a GET request to the backend:
 
 ```jsx
 function fetchNotes() {
-  axios
-    .get("https://backend-day-05.onrender.com/api/notes")
-    .then((res) => {
-      setNotes(res.data.notes);
-    });
+  axios.get("https://backend-day-05.onrender.com/api/notes").then((res) => {
+    setNotes(res.data.notes);
+  });
 }
 ```
 
@@ -1472,7 +1782,7 @@ React State
 
 ### 📌 8. Fetching Data When the App Loads
 
-The `useEffect()` hook is used to fetch notes when the component loads.
+The `useEffect()` hook is used to fetch notes when the application loads.
 
 ```jsx
 useEffect(() => {
@@ -1480,17 +1790,11 @@ useEffect(() => {
 }, []);
 ```
 
-The empty dependency array:
-
-```jsx
-[]
-```
-
-means the effect runs when the component is initially mounted.
+The empty dependency array means the effect runs when the component is initially mounted.
 
 ### 📌 9. Creating a Note from the Frontend
 
-The form uses the `handleSubmit()` function.
+The `handleSubmit()` function sends the form data to the backend.
 
 ```jsx
 function handleSubmit(e) {
@@ -1516,23 +1820,15 @@ The function:
 2. Gets the title and description fields.
 3. Sends a POST request using Axios.
 4. Sends the note data to the backend.
-5. Fetches the updated list of notes.
+5. Fetches the updated notes list.
 
 ### 📌 10. Creating the Note Form
 
 ```jsx
 <form className="note-create-form" onSubmit={handleSubmit}>
-  <input
-    name="title"
-    type="text"
-    placeholder="Enter your title"
-  />
+  <input name="title" type="text" placeholder="Enter your title" />
 
-  <input
-    name="description"
-    type="text"
-    placeholder="Enter your description"
-  />
+  <input name="description" type="text" placeholder="Enter your description" />
 
   <button>Add Note</button>
 </form>
@@ -1541,12 +1837,12 @@ The function:
 The `name` attributes allow the form fields to be accessed through:
 
 ```jsx
-e.target.elements
+e.target.elements;
 ```
 
 ### 📌 11. Displaying Notes Using `map()`
 
-The notes are displayed using the JavaScript `map()` method.
+The notes are displayed using JavaScript's `map()` method.
 
 ```jsx
 <div className="notes">
@@ -1578,7 +1874,7 @@ function handleDeleteNote(noteId) {
 }
 ```
 
-The note ID is passed to the backend:
+The note ID is sent to:
 
 ```text
 DELETE /api/notes/:id
@@ -1610,9 +1906,9 @@ handleDeleteNote(note._id);
 
 ### 📌 14. Connecting Frontend and Backend
 
-The frontend communicates with the backend through Axios.
+The frontend communicates with the backend using Axios.
 
-The main API operations are:
+The application follows this flow:
 
 ```text
 React Frontend
@@ -1629,11 +1925,9 @@ Express REST API
 MongoDB
 ```
 
-This creates the complete full-stack data flow.
-
 ### 📌 15. Styling the Application
 
-The `index.css` file contains the application's global styles.
+The `index.css` file contains the global styles.
 
 The universal selector resets default browser spacing:
 
@@ -1647,12 +1941,12 @@ The universal selector resets default browser spacing:
 
 The application uses:
 
-* Dark background
-* Flexible note layout
-* Note cards
-* Form inputs
-* Add button
-* Delete button
+- Dark background
+- Flexible note layout
+- Note cards
+- Form inputs
+- Add button
+- Delete button
 
 ### 📌 16. Notes Layout
 
@@ -1670,91 +1964,11 @@ The notes container uses Flexbox:
 
 **Important Properties**
 
-* `display: flex` → Enables Flexbox.
-* `gap` → Adds spacing between note cards.
-* `flex-wrap: wrap` → Moves notes to the next line when necessary.
+- `display: flex` → Enables Flexbox.
+- `gap` → Adds spacing between note cards.
+- `flex-wrap: wrap` → Moves notes to the next line when necessary.
 
-### 📌 17. Note Card Styling
-
-Each note is displayed as a card:
-
-```css
-.note {
-  background-color: #ecd881;
-  padding: 1rem;
-  border-radius: 0.7rem;
-  max-width: 20rem;
-  color: rgb(44, 33, 33);
-}
-```
-
-The card contains:
-
-* Note title
-* Note description
-* Delete button
-
-### 📌 18. Form Styling
-
-The form uses Flexbox to arrange the input fields and button.
-
-```css
-.note-create-form {
-  display: flex;
-  gap: 1rem;
-  padding-inline: 3rem;
-  padding-block: 1rem;
-}
-```
-
-The inputs are styled with:
-
-```css
-.note-create-form input {
-  border: none;
-  padding-inline: 1rem;
-  padding-block: 1rem;
-  font-size: 1rem;
-  border-radius: 0.5rem;
-}
-```
-
-### 📌 19. Add and Delete Buttons
-
-The Add Note button uses a purple background:
-
-```css
-.note-create-form button {
-  cursor: pointer;
-  border: none;
-  padding-inline: 1rem;
-  padding-block: 0.5rem;
-  font-size: 1rem;
-  border-radius: 0.5rem;
-  background-color: #5a30e5;
-  color: #ffff;
-  font-weight: bold;
-}
-```
-
-The Delete button uses a red background:
-
-```css
-.notes button {
-  cursor: pointer;
-  border: none;
-  margin-top: 1rem;
-  padding-inline: 0.5rem;
-  padding-block: 0.3rem;
-  font-size: 1rem;
-  border-radius: 0.3rem;
-  background-color: #ed1616;
-  color: #ffff;
-  font-weight: bold;
-}
-```
-
-### 📌 20. Complete Application Flow
+### 📌 17. Complete Application Flow
 
 The complete application works like this:
 
@@ -1783,77 +1997,44 @@ React State
 Updated UI
 ```
 
-**Creating a Note**
+### 📌 18. Current CRUD Implementation
 
-```text
-User enters title + description
-          ↓
-React Form
-          ↓
-Axios POST Request
-          ↓
-Express API
-          ↓
-Mongoose Model
-          ↓
-MongoDB
-          ↓
-Note Created
-          ↓
-fetchNotes()
-          ↓
-Updated React UI
-```
+The backend implements all four CRUD operations:
 
-**Deleting a Note**
+- **Create** → Implemented in backend and frontend
+- **Read** → Implemented in backend and frontend
+- **Update** → Backend API implemented, frontend UI not yet implemented
+- **Delete** → Implemented in backend and frontend
 
-```text
-User clicks Delete
-          ↓
-React gets note._id
-          ↓
-Axios DELETE Request
-          ↓
-Express API
-          ↓
-findByIdAndDelete()
-          ↓
-MongoDB
-          ↓
-Note Deleted
-          ↓
-fetchNotes()
-          ↓
-Updated React UI
-```
+The current frontend does not yet contain an Edit button or an update function.
 
 ### 🎯 Part 2 Summary
 
-* Created a React frontend using Vite.
-* Used `createRoot()` to render the React application.
-* Used `StrictMode` during development.
-* Managed notes using React `useState`.
-* Used `useEffect` to fetch notes when the application loads.
-* Used Axios to communicate with the backend API.
-* Created notes using POST requests.
-* Fetched notes using GET requests.
-* Deleted notes using DELETE requests.
-* Displayed notes using the `map()` method.
-* Used MongoDB's `_id` to identify individual notes.
-* Styled the application using CSS and Flexbox.
-* Connected the React frontend with the Express backend.
-* Built a complete full-stack CRUD data flow.
+- Created a React frontend using Vite.
+- Used `createRoot()` to render the React application.
+- Used `StrictMode` during development.
+- Managed notes using React `useState`.
+- Used `useEffect` to fetch notes when the application loads.
+- Used Axios to communicate with the backend API.
+- Created notes using POST requests.
+- Fetched notes using GET requests.
+- Deleted notes using DELETE requests.
+- Displayed notes using the `map()` method.
+- Used MongoDB's `_id` to identify individual notes.
+- Styled the application using CSS and Flexbox.
+- Connected the React frontend with the Express backend.
 
 ### 🎯 Day 5 Summary
 
-* Built a complete full-stack Notes Application.
-* Created a REST API using Express.js.
-* Connected the backend to MongoDB using Mongoose.
-* Learned the role of schemas, models, collections, and documents.
-* Implemented Create, Read, Update, and Delete operations.
-* Used environment variables for database configuration.
-* Added CORS support for frontend-backend communication.
-* Built a React frontend using Vite.
-* Used Axios for API communication.
-* Used React hooks to manage application state and API calls.
-* Connected the frontend, backend, and database into one complete application.
+- Built a complete full-stack Notes Application.
+- Created a REST API using Express.js.
+- Connected the backend to MongoDB using Mongoose.
+- Learned the difference between schemas, models, collections, and documents.
+- Learned Mongoose CRUD methods.
+- Implemented Create, Read, Update, and Delete operations in the backend.
+- Used environment variables for database configuration.
+- Added CORS support for frontend-backend communication.
+- Built a React frontend using Vite.
+- Used Axios for API communication.
+- Used React hooks to manage application state and API calls.
+- Connected the frontend, backend, and database into one full-stack application.
