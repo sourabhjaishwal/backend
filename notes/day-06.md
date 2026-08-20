@@ -332,6 +332,77 @@ Hashed Password
 
 The original password should not be stored directly in the database.
 
+### How Password Hashing Works
+
+Hashing converts plain text data, such as a password, into a hashed value.
+
+```text
+Plain Text                           Hash
+
+test  ──────────── Hashing ────────────▶  3u9816513r3hi2r2387rnvki2vh378fw8432
+```
+
+The important properties of hashing are:
+
+**1. Same input produces the same output**
+
+If the same input is passed through the same hashing process, it will generate the same hash.
+
+```text
+test
+  │
+  ├── Hashing ──▶ 3u9816513r3hi2r2387rnvki2vh378fw8432
+  │
+  └── Hashing ──▶ 3u9816513r3hi2r2387rnvki2vh378fw8432
+```
+
+**2. Hashing is one-way**
+
+A hash cannot be converted back into the original plain text.
+
+```text
+Plain Text
+    │
+    ▼
+ Hashing
+    │
+    ▼
+Hash Value
+```
+
+For example:
+
+```text
+test
+  │
+  ▼
+Hashing
+  │
+  ▼
+3u9816513r3hi2r2387rnvki2vh378fw8432
+```
+
+The original value cannot simply be recovered from the hash.
+
+A hashed value can also be passed through a hashing function again, which produces another hash:
+
+```text
+3u9816513r3hi2r2387rnvki2vh378fw8432
+                    │
+                    ▼
+                 Hashing
+                    │
+                    ▼
+9i39p232nh2kjf2yp984yeu4e2hr232hrdu
+```
+
+**In simple words:**
+
+- Plain text is converted into a hash before storing a password.
+- The same input generates the same output when the same hashing process is used.
+- A hash cannot be converted back into its original plain text.
+- A hash can be passed through a hashing function again to generate another hash.
+
 ### 📌 10. Hashing Using MD5
 
 For learning purposes, a password can be hashed using Node.js `crypto`.
