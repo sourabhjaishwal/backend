@@ -2,6 +2,7 @@ const express = require("express");
 const userModel = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const authRouter = express.Router();
+const crypto = require("crypto");
 
 authRouter.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
@@ -14,10 +15,12 @@ authRouter.post("/register", async (req, res) => {
     });
   }
 
+  const hash = crypto.createHash("md5").update(password).digest("hex");
+
   const user = await userModel.create({
     name,
     email,
-    password,
+    password: hash,
   });
 
   const token = jwt.sign(
@@ -63,7 +66,8 @@ authRouter.post("/login", async (req, res) => {
     });
   }
 
-  const isPasswordMatched = user.password === password;
+  const isPasswordMatched =
+    user.password === crypto.createHash("md5").update(password).digest("hex");
 
   if (!isPasswordMatched) {
     return res.status(401).json({
@@ -78,10 +82,11 @@ authRouter.post("/login", async (req, res) => {
     process.env.JWT_SECRET,
   );
 
-  res.cookies("jwt_token", token);
+  res.cookie("jwt_token", token);
 
   res.status(201).json({
     message: "User logged in",
+    user,
   });
 });
 
